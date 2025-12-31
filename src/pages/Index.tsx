@@ -5,6 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 
 type Listing = {
@@ -36,6 +40,13 @@ type Request = {
 export default function Index() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('catalog');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newRequest, setNewRequest] = useState({
+    title: '',
+    description: '',
+    category: '',
+    budget: '',
+  });
 
   const categories = [
     { name: 'Ремонт', icon: 'Wrench' },
@@ -260,10 +271,89 @@ export default function Index() {
 
           <TabsContent value="requests" className="space-y-4">
             <div className="mb-4">
-              <Button className="w-full" size="lg">
-                <Icon name="Plus" size={20} className="mr-2" />
-                Создать запрос
-              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full" size="lg">
+                    <Icon name="Plus" size={20} className="mr-2" />
+                    Создать запрос
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Создать новый запрос</DialogTitle>
+                    <DialogDescription>
+                      Опишите, какая помощь вам нужна. Соседи увидят ваш запрос и смогут откликнуться.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="title">Заголовок запроса</Label>
+                      <Input
+                        id="title"
+                        placeholder="Например: Помощь с переездом"
+                        value={newRequest.title}
+                        onChange={(e) => setNewRequest({ ...newRequest, title: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="category">Категория</Label>
+                      <Select
+                        value={newRequest.category}
+                        onValueChange={(value) => setNewRequest({ ...newRequest, category: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите категорию" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="repair">Ремонт</SelectItem>
+                          <SelectItem value="cleaning">Уборка</SelectItem>
+                          <SelectItem value="gardening">Садоводство</SelectItem>
+                          <SelectItem value="delivery">Доставка</SelectItem>
+                          <SelectItem value="other">Другое</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Описание</Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Подробно опишите, что нужно сделать..."
+                        rows={4}
+                        value={newRequest.description}
+                        onChange={(e) => setNewRequest({ ...newRequest, description: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="budget">Бюджет</Label>
+                      <Input
+                        id="budget"
+                        placeholder="Например: 1000-1500 ₽ или Договорная"
+                        value={newRequest.budget}
+                        onChange={(e) => setNewRequest({ ...newRequest, budget: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Отмена
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={() => {
+                        setIsDialogOpen(false);
+                        setNewRequest({ title: '', description: '', category: '', budget: '' });
+                      }}
+                    >
+                      <Icon name="Send" size={16} className="mr-2" />
+                      Опубликовать
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
             {requests.map((request) => (
               <Card key={request.id} className="hover:shadow-md transition-shadow animate-scale-in">
