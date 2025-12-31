@@ -41,11 +41,18 @@ export default function Index() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('catalog');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [newRequest, setNewRequest] = useState({
     title: '',
     description: '',
     category: '',
     budget: '',
+  });
+  const [newProduct, setNewProduct] = useState({
+    title: '',
+    description: '',
+    price: '',
+    condition: '',
   });
 
   const categories = [
@@ -101,6 +108,51 @@ export default function Index() {
         verified: false,
       },
       distance: '500 м от вас',
+    },
+    {
+      id: 4,
+      title: 'Велосипед горный',
+      description: 'Почти новый, использовался 1 сезон, 21 скорость',
+      price: 8500,
+      type: 'product',
+      category: 'Товары',
+      author: {
+        name: 'Алексей Новиков',
+        avatar: 'АН',
+        rating: 4.7,
+        verified: true,
+      },
+      distance: '400 м от вас',
+    },
+    {
+      id: 5,
+      title: 'Детская коляска',
+      description: 'В отличном состоянии, после одного ребенка, все функции работают',
+      price: 5000,
+      type: 'product',
+      category: 'Товары',
+      author: {
+        name: 'Елена Васильева',
+        avatar: 'ЕВ',
+        rating: 5.0,
+        verified: true,
+      },
+      distance: '150 м от вас',
+    },
+    {
+      id: 6,
+      title: 'Настольная лампа IKEA',
+      description: 'Новая, не подошла по цвету',
+      price: 1200,
+      type: 'product',
+      category: 'Товары',
+      author: {
+        name: 'Ольга Петрова',
+        avatar: 'ОП',
+        rating: 4.6,
+        verified: false,
+      },
+      distance: '600 м от вас',
     },
   ];
 
@@ -196,10 +248,14 @@ export default function Index() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsList className="grid w-full grid-cols-4 mb-6">
             <TabsTrigger value="catalog">
               <Icon name="Grid3x3" size={16} className="mr-2" />
               Каталог
+            </TabsTrigger>
+            <TabsTrigger value="products">
+              <Icon name="ShoppingBag" size={16} className="mr-2" />
+              Товары
             </TabsTrigger>
             <TabsTrigger value="requests">
               <Icon name="MessageSquare" size={16} className="mr-2" />
@@ -422,6 +478,145 @@ export default function Index() {
                       <Icon name="Repeat" size={16} className="mr-2" />
                       Предложить обмен
                     </Button>
+                  </CardContent>
+                </Card>
+              ))}
+          </TabsContent>
+
+          <TabsContent value="products" className="space-y-4">
+            <div className="mb-4">
+              <Dialog open={isProductDialogOpen} onOpenChange={setIsProductDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full" size="lg">
+                    <Icon name="Plus" size={20} className="mr-2" />
+                    Разместить товар
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[500px]">
+                  <DialogHeader>
+                    <DialogTitle>Разместить товар на продажу</DialogTitle>
+                    <DialogDescription>
+                      Опишите товар, который хотите продать соседям. Укажите цену и состояние.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="product-title">Название товара</Label>
+                      <Input
+                        id="product-title"
+                        placeholder="Например: Велосипед горный"
+                        value={newProduct.title}
+                        onChange={(e) => setNewProduct({ ...newProduct, title: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="product-price">Цена</Label>
+                      <Input
+                        id="product-price"
+                        type="number"
+                        placeholder="5000"
+                        value={newProduct.price}
+                        onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="product-condition">Состояние</Label>
+                      <Select
+                        value={newProduct.condition}
+                        onValueChange={(value) => setNewProduct({ ...newProduct, condition: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Выберите состояние" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new">Новое</SelectItem>
+                          <SelectItem value="like-new">Почти новое</SelectItem>
+                          <SelectItem value="good">Хорошее</SelectItem>
+                          <SelectItem value="used">Б/у</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="product-description">Описание</Label>
+                      <Textarea
+                        id="product-description"
+                        placeholder="Опишите товар, его особенности..."
+                        rows={4}
+                        value={newProduct.description}
+                        onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setIsProductDialogOpen(false)}
+                    >
+                      Отмена
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={() => {
+                        setIsProductDialogOpen(false);
+                        setNewProduct({ title: '', description: '', price: '', condition: '' });
+                      }}
+                    >
+                      <Icon name="Send" size={16} className="mr-2" />
+                      Опубликовать
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+            {listings
+              .filter((l) => l.type === 'product')
+              .map((listing) => (
+                <Card key={listing.id} className="hover:shadow-md transition-shadow animate-scale-in">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <Avatar>
+                          <AvatarFallback className="bg-primary text-primary-foreground">
+                            {listing.author.avatar}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <CardTitle className="text-lg">{listing.author.name}</CardTitle>
+                            {listing.author.verified && (
+                              <Badge variant="secondary" className="h-5 px-1.5">
+                                <Icon name="BadgeCheck" size={12} className="mr-1" />
+                                <span className="text-xs">Проверен</span>
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <div className="flex items-center">
+                              <Icon name="Star" size={14} className="fill-yellow-400 text-yellow-400 mr-1" />
+                              {listing.author.rating}
+                            </div>
+                            <span>•</span>
+                            <div className="flex items-center">
+                              <Icon name="MapPin" size={14} className="mr-1" />
+                              {listing.distance}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <Badge>Товар</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <h3 className="font-semibold text-lg mb-2">{listing.title}</h3>
+                    <CardDescription className="mb-3">{listing.description}</CardDescription>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-primary">{listing.price} ₽</span>
+                      <Button>
+                        <Icon name="ShoppingCart" size={16} className="mr-2" />
+                        Купить
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
